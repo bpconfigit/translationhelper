@@ -1,0 +1,90 @@
+﻿<Window x:Class="TranslationHelper.CompareDirectory"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TranslationHelper"
+        xmlns:model="clr-namespace:TranslationHelper.ViewModel"
+        xmlns:behavior="clr-namespace:TranslationHelper.Behaviors"
+        xmlns:command="clr-namespace:TranslationHelper.Command"
+        xmlns:converter="clr-namespace:TranslationHelper.Converters"
+        mc:Ignorable="d"
+        Title="CompareDirectory"
+        Height="450"
+        Width="800">
+  <Window.Resources>
+    <model:CompareViewModel x:Key="CompareModel"
+                            ApplicationModel="{StaticResource ApplicationModel}" />
+    <command:CompareDirectoryCommand x:Key="CompareDirectoryCommand" />
+    <command:OpenCompareDirectoryCommand x:Key="OpenCompareDirectoryCommand" />
+    <converter:TranslatedValueConverter x:Key="TranslatedValueConverter" />
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+    <TextBlock Grid.Row="0"
+               Grid.Column="0"
+               Text="Source directory" />
+    <TextBox Grid.Row="1"
+             Grid.Column="0"
+             Text="{Binding TranslationDirectory,Source={StaticResource ApplicationModel}}"
+             IsEnabled="False" />
+    <TextBlock Grid.Row="0"
+               Grid.Column="1"
+               Text="Compare directory" />
+    <TextBox Grid.Row="1"
+             Grid.Column="1"
+             Text="{Binding TargetDirectory,Source={StaticResource CompareModel}}"
+             IsEnabled="False" />
+    <Button Grid.Row="1"
+            Grid.Column="2"
+            Content="..."
+            Command="{StaticResource OpenCompareDirectoryCommand}"
+            CommandParameter="{StaticResource CompareModel}" />
+
+    <TabControl Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3">
+      <TabItem Header="Missing keys">
+        <ListView ItemsSource="{Binding MissingKeys, Source={StaticResource CompareModel}}" >
+          <ListView.View>
+            <GridView behavior:GridViewColumns.ColumnsSource="{Binding Source={StaticResource CompareModel},Path=StringTranslationColumnCollection}" />
+          </ListView.View>
+        </ListView>
+      </TabItem>
+      <TabItem Header="Keys with different values">
+        <ListView ItemsSource="{Binding KeysWithDifferentValues, Source={StaticResource CompareModel}, Mode=OneWay}">
+          <ListView.View>
+            <GridView behavior:GridViewColumns.ColumnsSource="{Binding Source={StaticResource CompareModel},Path=StringTranslationTranslationColumnCollection}" />
+          </ListView.View>
+        </ListView>
+      </TabItem>
+      <TabItem Header="Extra keys">
+        <ListView ItemsSource="{Binding ExtraKeys, Source={StaticResource CompareModel}, Mode=OneWay}">
+          <ListView.View>
+            <GridView behavior:GridViewColumns.ColumnsSource="{Binding Source={StaticResource CompareModel},Path=StringTranslationColumnCollection}" />
+          </ListView.View>
+        </ListView>
+      </TabItem>
+    </TabControl>
+
+    <WrapPanel Grid.Column="0"
+               Grid.Row="3"
+               Grid.ColumnSpan="3">
+      <Button Content="Close"
+              IsEnabled="False" />
+      <Button Content="Compare"
+              Command="{StaticResource CompareDirectoryCommand}"
+              CommandParameter="{StaticResource CompareModel}" />
+    </WrapPanel>
+  </Grid>
+</Window>
